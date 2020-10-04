@@ -46,10 +46,9 @@ public class App
     	var stepH = (kfc.longitude() - forestHill.longitude())/10;
     	var stepV = (forestHill.latitude() - meadows.latitude())/10;
         var listFeat = new ArrayList<Feature>();
-    	
     	for(int i=0;i<10;i++) {
     		for(int j=0;j<10;j++) {
-    			Point a1 = Point.fromLngLat(forestHill.longitude()+i*stepH,forestHill.latitude() - j * stepV);
+    			Point a1 = Point.fromLngLat(forestHill.longitude()+j*stepH,forestHill.latitude() - i * stepV);
     			Point a2 = Point.fromLngLat(a1.longitude(), a1.latitude()-stepV);
     			Point a3 = Point.fromLngLat(a1.longitude()+stepH , a1.latitude() - stepV);
     			Point a4 = Point.fromLngLat(a1.longitude()+stepH, a1.latitude());
