@@ -39,20 +39,20 @@ public class App
     	      System.out.println("An error occurred.");
     	      e.printStackTrace();
     	    }
-    	Point forestHill = Point.fromLngLat(55.946233,-3.192473);
-    	Point kfc = Point.fromLngLat(55.946233,-3.1843193);
-    	Point meadows = Point.fromLngLat(55.942617,-3.192473);
-    	Point buccleuch = Point.fromLngLat(55.942617,-3.184319);
-    	var stepH = (kfc.latitude() - forestHill.latitude())/10;
-    	var stepV = (forestHill.longitude() - meadows.longitude())/10;
+    	Point forestHill = Point.fromLngLat(-3.192473,55.946233);
+    	Point kfc = Point.fromLngLat(-3.1843193,55.946233);
+    	Point meadows = Point.fromLngLat(-3.192473,55.942617);
+    	Point buccleuch = Point.fromLngLat(-3.184319,55.942617);
+    	var stepH = (kfc.longitude() - forestHill.longitude())/10;
+    	var stepV = (forestHill.latitude() - meadows.latitude())/10;
         var listFeat = new ArrayList<Feature>();
     	
     	for(int i=0;i<10;i++) {
     		for(int j=0;j<10;j++) {
-    			Point a1 = Point.fromLngLat(forestHill.longitude()+i*stepV,forestHill.latitude() + j * stepH);
-    			Point a2 = Point.fromLngLat(a1.longitude()+stepV, a1.latitude());
-    			Point a3 = Point.fromLngLat(a1.longitude() + stepV, a1.latitude() + stepH);
-    			Point a4 = Point.fromLngLat(a1.longitude(), a1.latitude()+stepH);
+    			Point a1 = Point.fromLngLat(forestHill.longitude()+i*stepH,forestHill.latitude() - j * stepV);
+    			Point a2 = Point.fromLngLat(a1.longitude(), a1.latitude()-stepV);
+    			Point a3 = Point.fromLngLat(a1.longitude()+stepH , a1.latitude() - stepV);
+    			Point a4 = Point.fromLngLat(a1.longitude()+stepH, a1.latitude());
     			var pol1 = new ArrayList<List<Point>>();
     			var pol2 = new ArrayList<Point>();
     			pol2.add(a1);pol2.add(a2);pol2.add(a3);pol2.add(a4);
