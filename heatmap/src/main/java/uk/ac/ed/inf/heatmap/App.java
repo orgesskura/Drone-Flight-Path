@@ -24,7 +24,7 @@ public class App
     	// write with try and catch in case there are errors with trading file
     	try {
     		  // read file and save inputs to input array
-    	      File myObj = new File("predictions.txt");
+    	      File myObj = new File(args[0]);
     	      Scanner myReader = new Scanner(myObj);
     	      while (myReader.hasNextLine()) {
     	        String data = myReader.nextLine();
