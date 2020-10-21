@@ -50,7 +50,7 @@ public class App
         var listFeat = new ArrayList<Feature>();
     	for(int i=0;i<10;i++) {
     		for(int j=0;j<10;j++) {
-    			// Point a1 will be the leftmost,upper point. Then we go to a2,a3 ,a4 anti-clockwise
+    			// Point a1 will be the leftmost,upper point. Then we go to a2,a3 ,a4 anti-clockwise 
     			Point a1 = Point.fromLngLat(forestHill.longitude()+j*stepH,forestHill.latitude() - i * stepV);
     			Point a2 = Point.fromLngLat(a1.longitude(), a1.latitude()-stepV);
     			Point a3 = Point.fromLngLat(a1.longitude()+stepH , a1.latitude() - stepV);
