@@ -18,19 +18,23 @@ import java.lang.reflect.Type;
 
 public class App 
 {
+	//declare a client that will be used for every request
 	private static final HttpClient client = HttpClient.newHttpClient();
 	//declare a static variable to contain list of coordinates of each sensor
 	private static ArrayList<ArrayList<Double>> list_coordinates_sensors = new ArrayList<ArrayList<Double>>();
 	//declare a static variable to contain list of charge of battery of each sensor
 	private static ArrayList<Double> list_batteries = new ArrayList<Double>();
 	//declare a static variable to contain list of readings for that sensor
-	private static ArrayList<Double> list_readings = new ArrayList<Double>();
+	private static ArrayList<String> list_readings = new ArrayList<String>();
+	//declare a static variable to contain a list of no-fly-zones
+	private static ArrayList<Polygon> list_polygon = new ArrayList<Polygon>();
+	
 	
 	// used as class to parse maps JSon files
 	public static class Map {
 		String location;
 	    double battery;
-	    double reading;
+	    String reading;
 	}
 	
 	// used as class to parse  JSon files in what3Words
@@ -71,23 +75,29 @@ public class App
 	}
 	
 	//get list of readings of sensors
-	public static ArrayList<Double> get_readings(){
+	public static ArrayList<String> get_readings(){
 		return list_readings;
 	}
 	
+	//get list of polygons of no-fly zones
+	public static ArrayList<Polygon> get_buildings(){
+		return list_polygon;
+	}
+	
+	
     public static void main( String[] args )
     {
-    	
+    	parseJSon("15","06","2020","8888");
     	
     }
     
     
     
-    public static void readMap(int day,int month,int year ,int port) {
+    private static void readMap(String day,String month,String year ,String port) {
     	//create a string s to feed it as a request to get the map data for a particular day
-    	String s = "http://localhost:" + Integer.toString(port) + "/";
-    	s+= "maps/" + Integer.toString(year) + "/" + Integer.toString(month) + "/";
-    	s+= Integer.toString(day) + "/" + "air-quality-data.json";
+    	String s = "http://localhost:" + port + "/";
+    	s+= "maps/" + year + "/" + month + "/";
+    	s+= day + "/" + "air-quality-data.json";
     	//make a request to get data in the specified path
     	String urlString = s;
     	var request = HttpRequest.newBuilder()
@@ -113,9 +123,9 @@ public class App
 				// read the what3Word location
 				var location = i.location;
 				// use split method to split string on "." character to get locaction
-				String[] str = location.split("//.");
+				String[] str = location.split("\\.");
 				//form the path for the what3Word
-				var path = "http://localhost:" + Integer.toString(port) + "/" + "words" + "/";
+				var path = "http://localhost:" + port + "/" + "words" + "/";
 				path +=  str[0] +"/" +str[1] + "/" + str[2] + "/details.json";
 				//read this path via readWord function
 				var coordinates = readWord(path);
@@ -137,7 +147,7 @@ public class App
     
     
     
-    public static ArrayList<Double> readWord(String path) {
+    private static ArrayList<Double> readWord(String path) {
     	//give the path as argument and get the JSon file associated with that path
     	String urlString = path;
     	var list = new ArrayList<Double>();
@@ -172,10 +182,10 @@ public class App
     }
     
     
-    public static ArrayList<Polygon> getBuildings() {
-    	// HttpClient assumes that it is a GET request by default.
-    	var polygons = new ArrayList<Polygon>();
+    private static void getBuildings() {
+    	//location of no fly zones buildings
     	String urlString = "http://localhost:8888/buildings/no-fly-zones.geojson";
+    	// HttpClient assumes that it is a GET request by default.
     	var request = HttpRequest.newBuilder()
     			      .uri(URI.create(urlString))
     			      .build();
@@ -185,14 +195,14 @@ public class App
 			response.statusCode();
 			//get the JSon string from the response
 			var data = response.body();
-			//get a list of polygons from the geojson file by turning to list of collections and then
+			//get a list of polygons from the Geo-JSON file by turning to list of collections and then
 			// to a list of features and then to a list of polygons
             var collection = FeatureCollection.fromJson(data);
             var features = collection.features();
             for(var feat : features) {
             	var geo = feat.geometry();
             	var pol = (Polygon)geo;
-            	polygons.add(pol);
+            	list_polygon.add(pol);
             }
             
 		// try to catch errors 			
@@ -205,8 +215,11 @@ public class App
 			e.printStackTrace();
 		}
     	//for each polygon there is a .coordinates method to get the list of list of points
-    	//return the list of polygons
-    	return polygons;
+    }
+    
+    public static void parseJSon(String day,String month,String year ,String port) {
+    	readMap(day,month,year,port);
+    	getBuildings();
     }
     
 }
