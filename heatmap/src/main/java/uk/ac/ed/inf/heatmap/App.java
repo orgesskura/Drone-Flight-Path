@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.heatmap;
 import com.mapbox.geojson.FeatureCollection;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,6 @@ public class App
     	Point forestHill = Point.fromLngLat(-3.192473,55.946233);
     	Point kfc = Point.fromLngLat(-3.1843193,55.946233);
     	Point meadows = Point.fromLngLat(-3.192473,55.942617);
-    	Point buccleuch = Point.fromLngLat(-3.184319,55.942617);
     	// calculate how much is the width and depth of the polygons we want
     	var stepH = (kfc.longitude() - forestHill.longitude())/10;
     	var stepV = (forestHill.latitude() - meadows.latitude())/10;
@@ -58,7 +58,7 @@ public class App
     			// declare list of list of points,add those points and create a polygon out of them
     			var pol1 = new ArrayList<List<Point>>();
     			var pol2 = new ArrayList<Point>();
-    			pol2.add(a1);pol2.add(a2);pol2.add(a3);pol2.add(a4);
+    			pol2.add(a1);pol2.add(a2);pol2.add(a3);pol2.add(a4);pol2.add(a1);
     			pol1.add(pol2);
     			Polygon polygon3 = Polygon.fromLngLats(pol1);
     			// Create Geometry,then a Feature out of the polygon object
