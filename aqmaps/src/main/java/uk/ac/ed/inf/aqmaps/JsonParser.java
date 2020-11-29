@@ -1,11 +1,11 @@
 package uk.ac.ed.inf.aqmaps;
 
 import java.io.IOException;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
+
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -14,7 +14,8 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Polygon;
 
 import java.lang.reflect.Type;
-public class Parser {
+
+public class JsonParser {
 	//declare a client that will be used for every request
 		private static final HttpClient client = HttpClient.newHttpClient();
 		//declare a static variable to contain list of coordinates of each sensor
@@ -84,7 +85,7 @@ public class Parser {
 		
 	    public static void main( String[] args )
 	    {
-	    	parseJSon("15","06","2020","8888");
+	    	//parseJSon("15","06","2020","8888");
 	    	
 	    }
 	    
@@ -214,7 +215,8 @@ public class Parser {
 	    	//for each polygon there is a .coordinates method to get the list of list of points
 	    }
 	    
-	    public static void parseJSon(String day,String month,String year ,String port) {
+	    // main function to parse JSon files
+	    protected static void parseJSon(String day,String month,String year ,String port) {
 	    	readMap(day,month,year,port);
 	    	getBuildings();
 	    }
