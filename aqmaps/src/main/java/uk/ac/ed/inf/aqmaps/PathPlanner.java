@@ -17,21 +17,20 @@ public class PathPlanner {
    // have global dist matrix and permutation array  to show distance between points and order of visiting
    private static double[][] dist = new double[34][34];
    private static int[] perm = new int[34];
-   // direction variable that may be used to indicate direction of points with respect to polygon
-   private static int direction = 0;
+ 
    // add polygon number and line number to an array and return it
    private static ArrayList<Integer> nr = new ArrayList<Integer>();
-   //think about not hardcoding 33 as number of sensors might change
-   private static ArrayList<ArrayList<ArrayList<Point>>> visitedPoints = new ArrayList<ArrayList<ArrayList<Point>>>();
+   
    public static void main( String[] args )
    {
-   	   JsonParser.parseJSon("11","11","2020","8888");
+   	   JsonParser.parseJSon("12","12","2020","8888");
    	   var buildings = new ArrayList<Polygon>();
    	   buildings = JsonParser.get_buildings();
    	   var coordinates = new ArrayList<ArrayList<Double>>();
    	   var start = new ArrayList<Double>();
    	   start.add(-3.188396);
    	   start.add(55.944425);
+     //	-3.188396  55.944425
    	   coordinates.add(start);
    	   coordinates.addAll(JsonParser.get_coordinates());
    	   //do this for maintainability.Nr of sensors we want to visit might change in the future
@@ -53,6 +52,8 @@ public class PathPlanner {
    	   }
    	   var lines = writeTofile(coordinates);
    	   features.addAll(lines);
+   	   var ft = writeConfine();
+   	   features.addAll(ft);
    	   var fc = FeatureCollection.fromFeatures(features);
    	   var str = fc.toJson();
    	   try (FileWriter file = new FileWriter("Attemp1.geojson")) {
@@ -98,9 +99,7 @@ public class PathPlanner {
            
 			   if (res) {
 				   System.out.println(i +":" + j);
-				   for (var k : nr) {
-					   System.out.println(k);
-				   }
+				
 //				   points = buildDist(i,j,list_coordinates.get(i),list_coordinates.get(j),pols);
 //     			   list_points.add(points);
 				   distance = 1000;
@@ -219,10 +218,6 @@ public class PathPlanner {
 	   var intersec = new HashSet<Integer>();
 	   // just a counter to use to address polygon number
 	   int counter = 1;
-	   // use this to address line number
-	   int counter2 = 0;
-	   // use this to get polygon number
-	   int counter1 = 0;
 	   // use this to find the closest line
 	   double min = 10000;
 	   for(var pol : pols) {
@@ -258,236 +253,18 @@ public class PathPlanner {
 			   //if my line and one of the lines intersect, then 
 			   if(line.intersectsLine(line1)) {
 				   intersec.add(counter);
-				   if (findDist(list_points.get(i),list_points.get(y),list1,list2) < min ) {
-					   min = findDist(list_points.get(i),list_points.get(y),list1,list2);
-					   counter1 = counter;
-					   counter2 = i+1;
-				   }
 			   }
 		   }
 		  counter ++; 
 	   }
 		     // add polygon number and line number to an array and return it
-	    nr.add(counter1);
-	    nr.add(counter2);
+	   
 		if(intersec.size()==0) {
 		    	return false;
 		    }
 		return true;
    }
    
-   
-   
-   //function to find distance from intersection of 2 lines
-   private static double findDist(ArrayList<Double> point1,ArrayList<Double> point2, ArrayList<Double> point3,ArrayList<Double>point4) {
-	   if(point3.get(0) == point4.get(0)) {
-		   double lng = point3.get(0);
-		   double lat = ((point2.get(1)-point1.get(1))/(point2.get(0)-point1.get(0))) * (lng - point1.get(0)) + point1.get(1);
-		   double squared_dist = Math.pow((point3.get(1)-lat), 2);
-		   return Math.sqrt(squared_dist);
-	   }
-	   else {
-		   // calculations done on paper
-		  double diff = (point2.get(1) - point1.get(1))/(point2.get(0) - point1.get(0));
-		  diff -= (point4.get(1) - point3.get(1))/(point4.get(0) - point3.get(0));
-		  double right_hand = point1.get(0)*((point2.get(1) - point1.get(1))/(point2.get(0) - point1.get(0)));
-		  right_hand -= point3.get(0)*((point4.get(1) - point3.get(1))/(point4.get(0) - point3.get(0)));
-		  right_hand += point3.get(1) - point1.get(1);
-		  double lng = right_hand / diff;
-		  double lat = ((point4.get(1) - point3.get(1))/(point4.get(0) - point3.get(0))) * (lng - point3.get(0)) + point3.get(1);
-		  double squared_dist = Math.pow((point3.get(0)-lng), 2) + Math.pow((point3.get(1)-lat), 2);
-		  return Math.sqrt(squared_dist);
-	   }
-   }
-   
-   
-   
-   // function to determine direction of the point with respect to the intersecting line
-   private static ArrayList<Double> encodingDirection(ArrayList<Double> point1,int polNumber,int lineNumber,ArrayList<Polygon> pols) {
-	   var return_points = new ArrayList<Double>();
-	// get List<List<Point>> from a polygon object
-	   var points = pols.get(nr.get(0)-1).coordinates();
-	   // this is where list of lines of the polygon will be stored
-	   var list_points = new ArrayList<ArrayList<Double>>();
-	   
-	   for (var point : points.get(0)) {
-		   // get longitude and latitude from polygon
-		   double lng = point.longitude();
-		   double lat = point.latitude();
-		   // create a  list that stores points
-		   var list_point = new ArrayList<Double>();
-		   list_point.add(lng);
-		   list_point.add(lat);
-		   list_points.add(list_point);
-            }
-	  var startPoint = new ArrayList<Double>();
-	  startPoint = list_points.get(lineNumber-1);
-	  var endPoint = new ArrayList<Double>();
-	  endPoint = list_points.get(lineNumber);
-	  double start_lng = startPoint.get(0);
-	  double start_lat = startPoint.get(1);
-	  double end_lng = endPoint.get(0);
-	  double end_lat = endPoint.get(1);
-	  double x_coord = point1.get(0);
-	  double y_coord = point1.get(1);
-	  return_points.add(start_lng);
-	  return_points.add(start_lat);
-	  return_points.add(end_lng);
-	  return_points.add(end_lat);
-	  System.out.println(end_lng);
-	  System.out.println(end_lat);
-	  if(y_coord >= end_lat && y_coord <= start_lat && x_coord < start_lng && x_coord < end_lng) {
-		  return_points.add(180.0);
-	  }
-	  else if (x_coord <= end_lng && x_coord >= start_lng && y_coord < start_lat && y_coord < end_lat) {
-		  return_points.add(270.0);
-	  }
-	  else if (y_coord <= end_lat && y_coord >= start_lat && x_coord > start_lng && x_coord > end_lng) {
-		  return_points.add(0.0);
-	  }
-	  else  {
-		  return_points.add(90.0);
-	  }
-	  return return_points;
-	  
-   }
-   
-   private static ArrayList<Point> buildDist(int i,int j,ArrayList<Double> start, ArrayList<Double> dest,ArrayList<Polygon> pols) {
-	   boolean result=true;
-	   var points = new ArrayList<Point>();
-	   var list = new ArrayList<Double>();
-	   list.add(start.get(0));
-	   list.add(start.get(1));
-	   while(result) {
-		       
-    	       var list2 = new ArrayList<Double>();
-    	       list2.add(dest.get(0));
-	           list2.add(dest.get(1));
-		       while(intersectsBuildings(list,list2,pols)) {
-		    	   var return_points = new ArrayList<Double>();
-		           return_points = encodingDirection(list,nr.get(0),nr.get(1),pols);
-		       //case when point is north of polygon
-			       if(return_points.get(4)==90.0) {
-				    if (list.get(0) > list2.get(0) ) {
-						   double lng = return_points.get(0);
-						   double lat = return_points.get(1);
-						   lng+=0.0003;
-						   list2.removeAll(list2);
-						   list2.add(lng);
-						   list2.add(lat);
-					   }
-				    else {
-					   double lng = return_points.get(2);
-					   double lat = return_points.get(3);
-					   lng-=0.0003;
-					   list2.removeAll(list2);
-					   list2.add(lng);
-					   list2.add(lat);
-				   }
-			   
-			   }
-			   // case when point is east of polygon 
-			   else if (return_points.get(4)==0.0) {
-				   double lng = return_points.get(0);
-				   double lat = return_points.get(1);
-				   lng+=0.0003;
-				   list2.removeAll(list2);
-				   list2.add(lng);
-				   list2.add(lat);
-			   }
-			   // case when point is south of polygon
-			   else if (return_points.get(4)==270.0) {
-				   double lng = return_points.get(0);
-				   double lat = return_points.get(1);
-				   lng-=0.0003;
-				   list2.removeAll(list2);
-				   list2.add(lng);
-				   list2.add(lat);
-			   }
-			   // case when is north of polygon
-			   else {
-				   double lng = return_points.get(2);
-				   double lat = return_points.get(3);
-				   lng-=0.0003;
-				   list2.removeAll(list2);
-				   list2.add(lng);
-				   list2.add(lat);
-			   }
-		   }
-     	   dist[i][j] += euclid_dist(list,list2);
-		   list.clear();
-		   list.add(list2.get(0));
-		   list.add(list2.get(1));
-		   
-		   Point point = Point.fromLngLat(list.get(0),list.get(1));
-		   points.add(point);
-		   if (list2.get(0)==dest.get(0) && list2.get(1) == dest.get(1)) {
-			   break;
-		   }
-	   }
-	   return points;
-   }
-   
-   private static ArrayList<Point> anotherMethod(ArrayList<Double> start, ArrayList<Double> dest){
-	   double dist1 = 0 ;
-	   double dist2 = 0;
-	   var point1 = new ArrayList<Point>();
-	   var point2 = new ArrayList<Point>();
-	   var start1 = new ArrayList<Double>();
-	   var start2 = new ArrayList<Double>();
-	   return new ArrayList<Point>();
-   }
-   
-   // function to return 2 ends of polygon
-   private static ArrayList<Point> findPoints(ArrayList<Double> start, int polNr, Polygon pol){
-       var coordinates = pol.coordinates();
-       var list_points = new ArrayList<Point>();
-       for(var point : coordinates.get(0)) {
-    	   var lng = point.longitude();
-    	   var lat = point.latitude();
-    	   var p = Point.fromLngLat(lng, lat);
-    	   list_points.add(p);
-       }
-       double min = 360;
-       double max = 0;
-       int min_i = -1;
-       int max_i = -1;
-       int counter = 0;
-       for (var p :list_points ) {
-    	   double angle = angle(start,p);
-    	   if(angle < min) {
-    		   min = angle;
-    		   min_i = counter;
-    	   }
-    	   if (angle > max) {
-    		   max = angle;
-    		   max_i = counter;
-    	   }
-    	   
-    	   
-    	   counter++;
-       }
-       var min_point = Point.fromLngLat(list_points.get(min_i).longitude(), list_points.get(min_i).latitude());
-       var max_point = Point.fromLngLat(list_points.get(max_i).longitude(), list_points.get(max_i).latitude());
-       
-       var return_points =new ArrayList<Point>();
-       return_points.add(min_point);
-       return_points.add(max_point);
-       return return_points;
-       
-       
-   }
-   
-   private static double angle(ArrayList<Double> start, Point a) {
-	   double angle = (float)Math.atan2(start.get(1)-a.latitude(), start.get(0) - a.longitude());
-	   angle = toDegrees(angle);
-	   if (angle < 0) angle += 360;
-	   return angle;
-   }
-   
-   private static double toDegrees(double a) {
-	   return a *180/Math.PI;
-   }
    
    private static ArrayList<Feature> writeTofile(ArrayList<ArrayList<Double>> coordinates){
 	   var fc = new ArrayList<Feature>();
@@ -503,6 +280,29 @@ public class PathPlanner {
 	   var line =  LineString.fromLngLats(list_point);
 	   var geo = (Geometry)line;
 	   var feat = Feature.fromGeometry(geo);
+	   fc.add(feat);
+	   return fc;
+   }
+   
+   private static ArrayList<Feature> writeConfine(){
+	   var fc = new ArrayList<Feature>();
+	   var list_point = new ArrayList<Point>();
+	   Point forestHill = Point.fromLngLat(-3.192473,55.946233);
+   	   Point kfc = Point.fromLngLat(-3.1843193,55.946233);
+   	   Point meadows = Point.fromLngLat(-3.192473,55.942617);
+   	   Point buccleuch = Point.fromLngLat(-3.184319, 55.942617);
+   	   list_point.add(forestHill);
+   	   list_point.add(kfc);
+   	   list_point.add(buccleuch);
+   	   list_point.add(meadows);
+   	   list_point.add(forestHill);
+   	   var line =  LineString.fromLngLats(list_point);
+	   var geo = (Geometry)line;
+	   var feat = Feature.fromGeometry(geo);
+	   feat.addNumberProperty("fill-opacity",0.75);
+	   feat.addStringProperty("stroke", "#ff0000");
+	   feat.addStringProperty("rgb-string", "#ff0000");
+	   feat.addStringProperty("fill", "#ff0000");
 	   fc.add(feat);
 	   return fc;
    }
