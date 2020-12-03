@@ -21,7 +21,7 @@ public class App
 	
     public static void main( String[] args )
     {
-    	JsonParser.parseJSon("05","05","2020","8888");
+    	JsonParser.parseJSon("12","12","2020","8888");
     	var buildings = new ArrayList<Polygon>();
     	buildings = JsonParser.get_buildings();
     	var coordinates = new ArrayList<ArrayList<Double>>();
@@ -101,15 +101,15 @@ public class App
     				opt2.add(lng);
     				opt2.add(lat1);
     				opt3.add(lng2);
-    				opt3.add(lat);
-    				opt4.add(lng);
+    				opt3.add(lat1);
+    				opt4.add(lng1);
     				opt4.add(lat2);
     				if(!PathPlanner.intersectsBuildings(current_location,opt1, buildings)) {
-    		    		if(opt1.get(0) >current_location.get(0) ) {
-    		    			angle_int = 0;
+    		    		if(opt1.get(1) >current_location.get(1) ) {
+    		    			angle_int = 90;
     		    		}
     		    		else {
-    		    			angle_int = 180;
+    		    			angle_int = 270;
     		    		}
     		    		angle_radians = angle_int*Math.PI / 180.0;
     					current_location.set(0, opt1.get(0));
@@ -119,11 +119,11 @@ public class App
     					
     				}
     				else if(!PathPlanner.intersectsBuildings(current_location,opt2, buildings)) {
-    					if(opt2.get(1)>current_location.get(1)) {
-    						angle_int = 90;
+    					if(opt2.get(0)>current_location.get(0)) {
+    						angle_int = 0;
     					}
     					else {
-    						angle_int = 270;
+    						angle_int = 90;
     					}
     					current_location.set(0, opt2.get(0));
     					current_location.set(1, opt2.get(1));
