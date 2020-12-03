@@ -210,7 +210,7 @@ public class PathPlanner {
    
    // generate the path using swapHeuristic and TwoOptHeuristic
    //using them together generates better results
-   public static void getPath(ArrayList<ArrayList<Double>> list_coordinates,int nr_points,ArrayList<Polygon> pols) {
+    static void getPath(ArrayList<ArrayList<Double>> list_coordinates,int nr_points,ArrayList<Polygon> pols) {
 	   initialize_perm(nr_points);
 	   buildDistMatrix(list_coordinates,nr_points,pols);
 	   swapHeuristic(nr_points);
@@ -220,7 +220,7 @@ public class PathPlanner {
    
    
    
-   protected static Boolean intersectsBuildings(ArrayList<Double>point1,ArrayList<Double>point2,ArrayList<Polygon> pols) {
+    static Boolean intersectsBuildings(ArrayList<Double>point1,ArrayList<Double>point2,ArrayList<Polygon> pols) {
 	   // create a new line
 	   var line = new Line2D.Double(point1.get(0),point1.get(1),point2.get(0),point2.get(1));
 	   //hashset that contains if line crosses with any of the lines of the polygons
@@ -314,7 +314,7 @@ public class PathPlanner {
 	   return fc;
    }
    
-   protected static boolean insidePolygon(ArrayList<Double> point, Polygon p) {
+   static boolean insidePolygon(ArrayList<Double> point, Polygon p) {
 	   var points = p.coordinates();
 	   var polyX = new ArrayList<Double>();
 	   var polyY = new ArrayList<Double>();
@@ -340,7 +340,7 @@ public class PathPlanner {
 	   
    }
    
-   protected static boolean inPolygons(ArrayList<Double> point,ArrayList<Polygon> pols) {
+    static boolean inPolygons(ArrayList<Double> point,ArrayList<Polygon> pols) {
 	   for (var pol : pols) {
 		   if (insidePolygon(point,pol)) {
 			   return true;
