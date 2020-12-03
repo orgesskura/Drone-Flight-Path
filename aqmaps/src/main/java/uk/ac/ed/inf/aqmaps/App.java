@@ -57,45 +57,30 @@ public class App
     	current_location.add(start.get(0));
     	current_location.add(start.get(1));
     	int nr_steps = 0;
+    	list_point.add(Point.fromLngLat(start.get(0), start.get(1)));
     	for(int i=1;i<coordinates.size();i++) {
     		var order_visit = perm[i];
     		var dest = new ArrayList<Double>();
     		dest = coordinates.get(order_visit);
     		var angle = angle(current_location,dest);
     		var angle_int = Math.round(angle/10.0) * 10;
-//    		if(PathPlanner.intersectsBuildings(current_location, dest , buildings)) {
-//    		   System.out.println("point at " + i + " is fucked up!!");
-//    		   if(current_location.get(1) > dest.get(1) ) {
-//    			   if(current_location.get(0) < dest.get(0)) {
-//    				   dest.set(0, dest.get(0) + 0.0002);
-//    			   }
-//    			   else if (current_location.get(0) < dest.get(0)) {
-//    				   dest.set(0, dest.get(0) - 0.0002);
-//    			   }
-//    		   }
-//    		   else {
-//    			   if(current_location.get(0) < dest.get(0)) {
-//    				   dest.set(0, dest.get(0) - 0.0002);
-//    			   }
-//    			   else if (current_location.get(0) < dest.get(0)) {
-//    				   dest.set(0, dest.get(0) + 0.0002);
-//    			   }
-//    			   
-//    		   }
-//    		
-//    		}
+
     		double angle_radians = angle_int*Math.PI / 180.0 ;
-    		System.out.println(angle);
+    		
     		var point1 = Point.fromLngLat(current_location.get(0), current_location.get(1));
-    		list_point.add(point1);
     		while(true) {
     			nr_steps++;
+    			angle = angle(current_location,dest);
+        		angle_int = Math.round(angle/10.0) * 10;
+        		System.out.println(angle_int);
+                angle_radians = angle_int*Math.PI / 180.0 ;
     			var lng = current_location.get(0) + 0.0003 * Math.cos(angle_radians);
     			var lat = current_location.get(1) + 0.0003* Math.sin(angle_radians);
     			var temp = new ArrayList<Double>();
     			temp.add(lng);
     			temp.add(lat);
-    			if(!PathPlanner.inPolygons(temp, buildings)) {
+    			if(!PathPlanner.intersectsBuildings(current_location, temp, buildings)) {
+    				
     				current_location.set(0, lng);
         			current_location.set(1, lat);
         			var point = Point.fromLngLat(lng, lat);
@@ -105,49 +90,83 @@ public class App
     			else {
     				var opt1 = new ArrayList<Double>();
     				var opt2 = new ArrayList<Double>();
+    				var opt3 = new ArrayList<Double>();
+    				var opt4 = new ArrayList<Double>();
     				var lng1 = current_location.get(0);
     				var lat1 = current_location.get(1);
+    				var lng2 = current_location.get(0) - 0.0003 * Math.cos(angle_radians);
+    				var lat2 = current_location.get(1) - 0.0003* Math.sin(angle_radians);
     				opt1.add(lng1);
     				opt1.add(lat);
     				opt2.add(lng);
     				opt2.add(lat1);
-    				if(!PathPlanner.inPolygons(opt1, buildings)) {
+    				opt3.add(lng2);
+    				opt3.add(lat);
+    				opt4.add(lng);
+    				opt4.add(lat2);
+    				if(!PathPlanner.intersectsBuildings(current_location,opt1, buildings)) {
+    		    		if(opt1.get(0) >current_location.get(0) ) {
+    		    			angle_int = 0;
+    		    		}
+    		    		else {
+    		    			angle_int = 180;
+    		    		}
+    		    		angle_radians = angle_int*Math.PI / 180.0;
     					current_location.set(0, opt1.get(0));
     					current_location.set(1, opt1.get(1));
-    					angle = angle(current_location,dest);
-    		    		angle_int = Math.round(angle/10.0) * 10;
-    		    		angle_radians = angle_int*Math.PI / 180.0 ;
+    					var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
+            			list_point.add(point);
+    					
     				}
-    				else {
+    				else if(!PathPlanner.intersectsBuildings(current_location,opt2, buildings)) {
+    					if(opt2.get(1)>current_location.get(1)) {
+    						angle_int = 90;
+    					}
+    					else {
+    						angle_int = 270;
+    					}
     					current_location.set(0, opt2.get(0));
     					current_location.set(1, opt2.get(1));
-    					angle = angle(current_location,dest);
-    		    		angle_int = Math.round(angle/10.0) * 10;
-    		    		angle_radians = angle_int*Math.PI / 180.0 ;
+    					var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
+            			list_point.add(point);
+            			System.out.println("1");
+    				}
+    				else if (!PathPlanner.intersectsBuildings(current_location,opt3, buildings)) {
+    					if(opt3.get(0) >current_location.get(0) ) {
+    		    			angle_int = 0;
+    		    		}
+    		    		else {
+    		    			angle_int = 180;
+    		    		}
+    		    		angle_radians = angle_int*Math.PI / 180.0;
+    					current_location.set(0, opt3.get(0));
+    					current_location.set(1, opt3.get(1));
+    					var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
+            			list_point.add(point);
+    					
+    				}
+    				else {
+    					if(opt4.get(1)>current_location.get(1)) {
+    						angle_int = 90;
+    					}
+    					else {
+    						angle_int = 270;
+    					}
+    					current_location.set(0, opt4.get(0));
+    					current_location.set(1, opt4.get(1));
+    					var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
+            			list_point.add(point);
     				}
     			}
     			
     			if(PathPlanner.euclid_dist(current_location,dest )<= 0.0002) {
     				visited++;
+    				System.out.println(visited);
+    				var sensor = list_sensors.get(i-1);
+    				sensor.set_status(true);
     				break;
     			}
-//    			else if (PathPlanner.euclid_dist(current_location,dest )<= 0.0003) {
-//    				
-//    				var angle2 = angle(current_location,dest);
-//    	    		var angle_int2 = Math.round(angle2/10.0) * 10;
-//    	    		var angle_radians2 = angle_int2*Math.PI / 180.0;
-//    	    		
-//        			while(PathPlanner.euclid_dist(current_location,dest ) > 0.0002) {
-//        				nr_steps++;
-//        				var lng2 = current_location.get(0) + 0.0003 * Math.cos(angle_radians2);
-//            			var lat2 = current_location.get(1) + 0.0003* Math.sin(angle_radians2);
-//            			current_location.set(0, lng2);
-//            			current_location.set(1, lat2);
-//        			}
-//        			visited++;
-//        			break;
-//        			
-//    			}
+    			
     		}
     	}
        System.out.println(visited);
@@ -173,6 +192,8 @@ public class App
 			
        }
        System.out.println(nr_steps);
+       System.out.println(list_point.size());
+       
        var line =  LineString.fromLngLats(list_point);
  	   var geo = (Geometry)line;
  	   var feat = Feature.fromGeometry(geo);
@@ -186,6 +207,7 @@ public class App
 		   features.add(feat2);
   	   }
   	   features.addAll(fl);
+  	   features.addAll(mark_sensors(list_sensors,coordinates));
   	   var fc = FeatureCollection.fromFeatures(features);
  	   var str = fc.toJson();
  	   try (FileWriter file = new FileWriter("Attemp1.geojson")) {
@@ -211,8 +233,130 @@ public class App
     private static double rad_to_degree(double angle) {
     	return angle * 180 / Math.PI;
     }
+    //segment a line to find if parts of it are in its intersection
+//    private static boolean segmentLine(ArrayList<Double> start, ArrayList<Double> end, 
+//    		ArrayList<Polygon> pols) {
+//    	double diff_x = end.get(0) - start.get(0);
+//    	double diff_y = end.get(1) - start.get(1);
+//    	diff_x /= 100;
+//    	diff_y /=100;
+//    	for(int i=1;i<=20;i++) {
+//    		double x = start.get(0) + diff_x*i;
+//    		double y = start.get(1) + diff_y*i;
+//    		var list = new ArrayList<Double>();
+//    		list.add(x);
+//    		list.add(y);
+//    		if(PathPlanner.inPolygons(list, pols)) {
+//    			return true;
+//    		}
+//    	}
+//    	return false;
+//    }
     
     
+    
+    // create a list of features
+    private static ArrayList<Feature> mark_sensors(ArrayList<Sensor> sensors,ArrayList<ArrayList<Double>> coordinates){
+    	var fl = new ArrayList<Feature>();
+    	for(int i=1;i<coordinates.size();i++) {
+    		var sensor = sensors.get(i-1);
+    		var loc = coordinates.get(i);
+    		var point = Point.fromLngLat(loc.get(0), loc.get(1));
+    		var geo = (Geometry) point;
+    		var feat = Feature.fromGeometry(geo);
+    		var reading = sensor.get_reading();
+    		var location = sensor.get_location();
+    		var battery = sensor.get_batteryLevel();
+    		var visited = sensor.get_status();
+    		boolean hasBattery = false;
+    		if(battery >=10) {
+    			hasBattery = true;
+    		}
+    		var list_string = new ArrayList<String>();
+    		var input = 0.0;
+    		if(!reading.equals("null")) {
+    			input = Double.valueOf(reading);
+    		}
+    		else {
+    			input = -1;
+    		}
+    		list_string = mapValue(visited,hasBattery,input);
+    		if(list_string.size()==2) {
+    			feat.addStringProperty("location", location);
+    			feat.addStringProperty("rgb-string", list_string.get(0));
+    			feat.addStringProperty("marker-color", list_string.get(1));
+    		}
+    		else if (list_string.size()==3) {
+    			feat.addStringProperty("location", location);
+    			feat.addStringProperty("rgb-string", list_string.get(0));
+    			feat.addStringProperty("marker-color", list_string.get(1));
+    			feat.addStringProperty("marker-symbol", list_string.get(2));
+    		}
+    		fl.add(feat);
+    	}
+    	return fl;
+    }
+    
+    
+    // map data to markers
+    private static ArrayList<String> mapValue(boolean visited, boolean hasBattery,double input) {
+    	var list = new ArrayList<String>();
+    	if(visited) {
+    		if(hasBattery) {
+			    	if (input>=0 && input< 32) {
+			    		list.add("#00ff00");
+			    		list.add("#00ff00");
+						list.add("lighthouse");
+					}
+					else if (input <64) {
+						list.add("#40ff00");
+						list.add("#40ff00");
+			            list.add("lighthouse");
+					}
+					else if(input< 96) {
+						list.add("#80ff00");
+						list.add("#80ff00");
+						list.add("lighthouse");
+					}
+					else if  (input < 128) {
+						list.add("#c0ff00");
+						list.add("#c0ff00");
+						list.add("lighthouse");
+					}
+					else if (input< 160) {
+						list.add("#ffc000");
+						list.add("#ffc000");
+						list.add("danger");
+					}
+					else if(input<192) {
+						list.add("#ff8000");
+						list.add("#ff8000");
+						list.add("danger");
+					}
+					else if(input<224) {
+						list.add("#ff4000");
+						list.add("#ff4000");
+						list.add("danger");
+					}
+					else {
+						list.add("#ff0000");
+						list.add("#ff0000");
+						list.add("danger");
+					}
+    		}
+    		else {
+    			  list.add("#000000");
+    			  list.add("#000000");
+    			  list.add("cross");
+    		}
+    }
+    	else {
+    		list.add("#aaaaaa");
+    		list.add("#aaaaaa");
+    	}
+    	return list;
+    
+    }
     
     
 }

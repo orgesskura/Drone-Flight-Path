@@ -30,7 +30,7 @@ public class PathPlanner {
    
    public static void main( String[] args )
    {
-   	   JsonParser.parseJSon("05","05","2020","8888");
+   	   JsonParser.parseJSon("01","01","2020","8888");
    	   var buildings = new ArrayList<Polygon>();
    	   buildings = JsonParser.get_buildings();
    	   var coordinates = new ArrayList<ArrayList<Double>>();
