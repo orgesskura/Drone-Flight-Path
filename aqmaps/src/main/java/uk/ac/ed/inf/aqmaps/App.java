@@ -21,7 +21,7 @@ public class App
 	
     public static void main( String[] args )
     {
-    	JsonParser.parseJSon("12","12","2020","8888");
+    	JsonParser.parseJSon("01","01","2020","8888");
     	var buildings = new ArrayList<Polygon>();
     	buildings = JsonParser.get_buildings();
     	var coordinates = new ArrayList<ArrayList<Double>>();
@@ -92,10 +92,12 @@ public class App
     				var opt2 = new ArrayList<Double>();
     				var opt3 = new ArrayList<Double>();
     				var opt4 = new ArrayList<Double>();
+    				lng = current_location.get(0) + 0.0003* getsgn(Math.cos(angle_radians));
+    				lat = current_location.get(1) + 0.0003* getsgn(Math.sin(angle_radians));
     				var lng1 = current_location.get(0);
     				var lat1 = current_location.get(1);
-    				var lng2 = current_location.get(0) - 0.0003 * Math.cos(angle_radians);
-    				var lat2 = current_location.get(1) - 0.0003* Math.sin(angle_radians);
+    				var lng2 = current_location.get(0) - 0.0003* getsgn(Math.cos(angle_radians));
+    				var lat2 = current_location.get(1) - 0.0003* getsgn(Math.sin(angle_radians));
     				opt1.add(lng1);
     				opt1.add(lat);
     				opt2.add(lng);
@@ -356,6 +358,15 @@ public class App
     	}
     	return list;
     
+    }
+    
+    private static int getsgn(double d) {
+    	if(d > 0) {
+    		return 1;
+    	}
+    	else {
+    		return -1;
+    	}
     }
     
     
