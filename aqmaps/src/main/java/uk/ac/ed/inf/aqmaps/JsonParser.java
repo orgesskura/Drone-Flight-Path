@@ -7,6 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,7 +27,8 @@ public class JsonParser {
 		private static ArrayList<String> list_readings = new ArrayList<String>();
 		//declare a static variable to contain a list of no-fly-zones
 		private static ArrayList<Polygon> list_polygon = new ArrayList<Polygon>();
-		
+		// declare  a static variable that maps coordinates to location in What3Words
+		private static HashMap<ArrayList<Double>,String> map = new HashMap<>();
 		
 		// used as class to parse maps JSon files
 		public static class Map {
@@ -82,6 +84,11 @@ public class JsonParser {
 			return list_polygon;
 		}
 		
+		// get mappings of coordinates to what3Words
+		public static HashMap<ArrayList<Double>,String> get_mappings(){
+			return map;
+		}
+		
 		
 	    public static void main( String[] args )
 	    {
@@ -127,6 +134,8 @@ public class JsonParser {
 					path +=  str[0] +"/" +str[1] + "/" + str[2] + "/details.json";
 					//read this path via readWord function
 					var coordinates = readWord(path);
+					// map each sensor location with its What3Words location
+					map.put(coordinates, location);
 					//add coordinates of that sensor to the list of coordinates of sensors
 					list_coordinates_sensors.add(coordinates);
 				}

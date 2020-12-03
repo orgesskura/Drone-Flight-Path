@@ -1,7 +1,9 @@
 package uk.ac.ed.inf.aqmaps;
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import com.mapbox.geojson.Polygon;
+
 import java.lang.Math;
 import java.awt.geom.Line2D;
 import java.io.FileWriter;
@@ -14,22 +16,31 @@ import com.mapbox.geojson.LineString;
 
 
 public class PathPlanner {
+   
    // have global dist matrix and permutation array  to show distance between points and order of visiting
    private static double[][] dist = new double[34][34];
    private static int[] perm = new int[34];
- 
-   // add polygon number and line number to an array and return it
-   private static ArrayList<Integer> nr = new ArrayList<Integer>();
+   
+   
+   //get permutation that works
+   public static int[] get_permutation() {
+	   return perm;
+   }
+   
    
    public static void main( String[] args )
    {
-   	   JsonParser.parseJSon("12","12","2020","8888");
+   	   JsonParser.parseJSon("05","05","2020","8888");
    	   var buildings = new ArrayList<Polygon>();
    	   buildings = JsonParser.get_buildings();
    	   var coordinates = new ArrayList<ArrayList<Double>>();
    	   var start = new ArrayList<Double>();
    	   start.add(-3.188396);
    	   start.add(55.944425);
+//   	   var experiment = new ArrayList<Double>();
+//   	   experiment.add(-3.187633752822876);
+//   	   experiment.add(55.94541799748307);
+//   	   System.out.println(inPolygons(experiment,buildings));
      //	-3.188396  55.944425
    	   coordinates.add(start);
    	   coordinates.addAll(JsonParser.get_coordinates());
@@ -87,7 +98,6 @@ public class PathPlanner {
 	   // find distance from sensor i to sensor j
 
 	   for (int i=0;i<nr_points;i++) {
-		   var  list_points = new ArrayList<ArrayList<Point>>();
 		   for(int j=0;j<nr_points;j++) {
 //			    this part is commented and will be copy - pasted after algorithm is finished
 			   // use this dist variable later when finding a path out of no fly zones
@@ -210,16 +220,13 @@ public class PathPlanner {
    
    
    
-   private static Boolean intersectsBuildings(ArrayList<Double>point1,ArrayList<Double>point2,ArrayList<Polygon> pols) {
-	   nr.removeAll(nr);
+   protected static Boolean intersectsBuildings(ArrayList<Double>point1,ArrayList<Double>point2,ArrayList<Polygon> pols) {
 	   // create a new line
 	   var line = new Line2D.Double(point1.get(0),point1.get(1),point2.get(0),point2.get(1));
 	   //hashset that contains if line crosses with any of the lines of the polygons
 	   var intersec = new HashSet<Integer>();
 	   // just a counter to use to address polygon number
 	   int counter = 1;
-	   // use this to find the closest line
-	   double min = 10000;
 	   for(var pol : pols) {
 		   // get List<List<Point>> from a polygon object
 		   var points = pol.coordinates();
@@ -274,9 +281,9 @@ public class PathPlanner {
 		   var point = Point.fromLngLat(list.get(0), list.get(1));
 		   list_point.add(point);
 	   }
-	   var start = coordinates.get(0);
-	   var point1 = Point.fromLngLat(start.get(0), start.get(1));
-	   list_point.add(point1);
+//	   var start = coordinates.get(0);
+//	   var point1 = Point.fromLngLat(start.get(0), start.get(1));
+//	   list_point.add(point1);
 	   var line =  LineString.fromLngLats(list_point);
 	   var geo = (Geometry)line;
 	   var feat = Feature.fromGeometry(geo);
@@ -305,6 +312,41 @@ public class PathPlanner {
 	   feat.addStringProperty("fill", "#ff0000");
 	   fc.add(feat);
 	   return fc;
+   }
+   
+   protected static boolean insidePolygon(ArrayList<Double> point, Polygon p) {
+	   var points = p.coordinates();
+	   var polyX = new ArrayList<Double>();
+	   var polyY = new ArrayList<Double>();
+	   for (var list: points.get(0)){
+		   polyX.add(list.longitude());
+		   polyY.add(list.latitude());
+	   }
+	    var x = point.get(0);
+	    var y = point.get(1);
+	    var inside = false;
+	    for (int i = 0, j = polyX.size() - 1;  i < polyX.size(); j = i++) { 
+	        var xi = polyX.get(i);
+	        var yi = polyY.get(i);
+	        var xj = polyX.get(j);
+	        var yj = polyY.get(j);
+	        
+	        var intersect = ((yi > y) != (yj > y))
+	            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+	        if (intersect) inside = !inside;
+	    }
+	    
+	    return inside;
+	   
+   }
+   
+   protected static boolean inPolygons(ArrayList<Double> point,ArrayList<Polygon> pols) {
+	   for (var pol : pols) {
+		   if (insidePolygon(point,pol)) {
+			   return true;
+		   }
+	   }
+	   return false;
    }
    
  
