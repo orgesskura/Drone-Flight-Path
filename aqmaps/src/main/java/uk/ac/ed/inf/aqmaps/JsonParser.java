@@ -176,11 +176,11 @@ public class JsonParser {
 	            list.add(lat);
 			//catch exceptions			
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 				System.exit(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 	    	//return list of coordinates

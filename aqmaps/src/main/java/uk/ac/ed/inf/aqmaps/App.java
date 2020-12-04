@@ -1,15 +1,6 @@
 package uk.ac.ed.inf.aqmaps;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 
@@ -18,7 +9,7 @@ import com.mapbox.geojson.Polygon;
 
 public class App 
 {   
-	private final int allowed_moves = 150;
+	private final static int allowed_moves = 150;
 	static ArrayList<Point> list_point = new ArrayList<Point>();
 	static int nr_steps = 0;
 	static ArrayList<String> list_sensors_visited = new ArrayList<String>();
@@ -35,6 +26,8 @@ public class App
     	var start = new ArrayList<Double>();
     	var longitude = Double.valueOf(longi);
     	var latitude = Double.valueOf(latit);
+    	var p = Point.fromLngLat(longitude, latitude);
+    	var drone = new Drone(allowed_moves,p);
     	start.add(longitude);
     	start.add(latitude);
     	coordinates.add(start);
@@ -64,11 +57,13 @@ public class App
     	current_location.add(start.get(1));
     	list_point.add(Point.fromLngLat(start.get(0), start.get(1)));
     	for(int i=1;i<coordinates.size();i++) {
+    		if(!drone.has_moves_left()) break;
     		var order_visit = perm[i];
     		var dest = new ArrayList<Double>();
     		dest = coordinates.get(order_visit);
     		while(true) {
-    			var bool = avoidObstacles(i,order_visit,current_location, dest,buildings,list_sensors);
+    			if(!drone.has_moves_left()) break;
+    			var bool = avoidObstacles(i,order_visit,current_location, dest,buildings,list_sensors,drone);
     			if (bool == true) {
     				break;
     			}
@@ -80,10 +75,11 @@ public class App
        end.add(start.get(1)); 
 	   // i have already read all the sensors so i finish if i am within 0.0003
        while(true) {
+            if(!drone.has_moves_left()) break;
 			int i=34,order_visit = 35;
 			current_location.set(0, list_point.get(list_point.size()-1).longitude());
 			current_location.set(1,list_point.get(list_point.size()-1).latitude());
-			var bool = avoidObstacles(i,order_visit,current_location, end,buildings,list_sensors);
+			var bool = avoidObstacles(i,order_visit,current_location, end,buildings,list_sensors,drone);
 			if (bool == true) {
 				break;
 			}
@@ -98,11 +94,13 @@ public class App
     	
     }
     
-    private static boolean avoidObstacles(int i,int perm,ArrayList<Double> current_location, ArrayList<Double> dest,ArrayList<Polygon> buildings,ArrayList<Sensor> list_sensors) {
-    	if(visited ==33 && PathPlanner.euclid_dist(current_location,dest )<= 0.0003) {
+    
+    private static boolean avoidObstacles(int i,int perm,ArrayList<Double> current_location, ArrayList<Double> dest,ArrayList<Polygon> buildings,ArrayList<Sensor> list_sensors,Drone drone) {
+    	if(visited ==33 && PathPlanner.euclid_dist(current_location,dest )< 0.0003) {
 			return true;
 		}
 		nr_steps++;
+		
 		var angle = angle(current_location,dest);
 		int angle_int = (int)Math.round(angle/10.0) * 10;
 		if(angle_int == 360) angle_int = 0;
@@ -164,7 +162,7 @@ public class App
 					angle_int = 0;
 				}
 				else {
-					angle_int = 90;
+					angle_int = 180;
 				}
 				current_location.set(0, opt2.get(0));
 				current_location.set(1, opt2.get(1));
@@ -198,9 +196,12 @@ public class App
     			list_point.add(point);
 			}
 		}
+		var last_point = list_point.get(list_point.size()-1);
+		drone.move(last_point);
+		drone.decrease_moves();
 		list_angles.add(angle_int);
 		
-		if(PathPlanner.euclid_dist(current_location,dest )<= 0.0002 && visited < 33) {
+		if(drone.in_range(dest) && visited < 33) {
 			visited++;
 			System.out.println(visited);
 			var sensor = list_sensors.get(perm-1);
