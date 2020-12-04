@@ -88,13 +88,6 @@ public class JsonParser {
 		public static HashMap<ArrayList<Double>,String> get_mappings(){
 			return map;
 		}
-		
-		
-	    public static void main( String[] args )
-	    {
-	    	//parseJSon("15","06","2020","8888");
-	    	
-	    }
 	    
 	    
 	    // read the maps folder
@@ -214,14 +207,12 @@ public class JsonParser {
 	            
 			// try to catch errors 			
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.exit(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	    	//for each polygon there is a .coordinates method to get the list of list of points
+	    	
 	    }
 	    
 	    // main function to parse JSon files
