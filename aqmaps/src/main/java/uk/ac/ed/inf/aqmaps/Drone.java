@@ -27,7 +27,7 @@ public class Drone {
     	  var list = new ArrayList<Double>();
     	  list.add(this.location.longitude());
     	  list.add(this.location.latitude());
-    	  if(PathPlanner.euclid_dist(list, dest) < 0.0002) {
+    	  if(PathPlanner.euclid_dist(list, dest) < App.range_read) {
     		  return true;
     	  }
     	  return false;

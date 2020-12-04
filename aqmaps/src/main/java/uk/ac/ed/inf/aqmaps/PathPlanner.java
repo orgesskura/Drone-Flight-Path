@@ -1,83 +1,25 @@
 package uk.ac.ed.inf.aqmaps;
 import java.util.ArrayList;
-
 import java.util.HashSet;
 import com.mapbox.geojson.Polygon;
-
 import java.lang.Math;
 import java.awt.geom.Line2D;
-import java.io.FileWriter;
-import java.io.IOException;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
-import com.mapbox.geojson.LineString;
 
 
 public class PathPlanner {
    
    // have global dist matrix and permutation array  to show distance between points and order of visiting
-   private static double[][] dist = new double[34][34];
-   private static int[] perm = new int[34];
+   static final int number = App.number_sensors;
+   private static double[][] dist = new double[number + 1][number + 1];
+   private static int[] perm = new int[number + 1];
    
    
    //get permutation that works
-   public static int[] get_permutation() {
+   static int[] get_permutation() {
 	   return perm;
    }
    
-   
-   public static void main( String[] args )
-   {
-   	   JsonParser.parseJSon("01","01","2020","8888");
-   	   var buildings = new ArrayList<Polygon>();
-   	   buildings = JsonParser.get_buildings();
-   	   var coordinates = new ArrayList<ArrayList<Double>>();
-   	   var start = new ArrayList<Double>();
-   	   start.add(-3.188396);
-   	   start.add(55.944425);
-//   	   var experiment = new ArrayList<Double>();
-//   	   experiment.add(-3.187633752822876);
-//   	   experiment.add(55.94541799748307);
-//   	   System.out.println(inPolygons(experiment,buildings));
-     //	-3.188396  55.944425
-   	   coordinates.add(start);
-   	   coordinates.addAll(JsonParser.get_coordinates());
-   	   //do this for maintainability.Nr of sensors we want to visit might change in the future
-   	   int nr_points = coordinates.size();
-   	   getPath(coordinates,nr_points,buildings);
-   	   double steps = tourValue() / 0.0003;
-   	   System.out.println(steps);
-   	   for(var i : perm) {
-   		   System.out.print(i + "   ");
-   	   }
-   	 // Uncomment this part to write geJson after doing the algorithm
-   	   var features = new ArrayList<Feature>();
-   	   for (var pol : buildings) {
-   		   var geo = (Geometry) pol;
-   		   var feat = Feature.fromGeometry(geo);
-   		   feat.addStringProperty("rgb-string", "#ff0000");
-		   feat.addStringProperty("fill", "#ff0000");
-		   features.add(feat);
-   	   }
-   	   var lines = writeTofile(coordinates);
-   	   features.addAll(lines);
-   	   var ft = writeConfine();
-   	   features.addAll(ft);
-   	   var fc = FeatureCollection.fromFeatures(features);
-   	   var str = fc.toJson();
-   	   try (FileWriter file = new FileWriter("Attemp1.geojson")) {
-		 
-        file.write(str);
-        file.flush();
-
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-   	   
-   	
-   }
    
    private static void initialize_perm(int n) {
 	   for(int i=0;i<n;i++) {
@@ -108,10 +50,6 @@ public class PathPlanner {
 			   var distance = euclid_dist(list_coordinates.get(i),list_coordinates.get(j));
            
 			   if (res) {
-				   System.out.println(i +":" + j);
-				
-//				   points = buildDist(i,j,list_coordinates.get(i),list_coordinates.get(j),pols);
-//     			   list_points.add(points);
 				   distance = 1000;
 			   }
 			   dist[i][j] += distance;
@@ -273,47 +211,7 @@ public class PathPlanner {
    }
    
    
-   private static ArrayList<Feature> writeTofile(ArrayList<ArrayList<Double>> coordinates){
-	   var fc = new ArrayList<Feature>();
-	   var list_point = new ArrayList<Point>();
-	   for(var i : perm) {
-		   var list = coordinates.get(i);
-		   var point = Point.fromLngLat(list.get(0), list.get(1));
-		   list_point.add(point);
-	   }
-//	   var start = coordinates.get(0);
-//	   var point1 = Point.fromLngLat(start.get(0), start.get(1));
-//	   list_point.add(point1);
-	   var line =  LineString.fromLngLats(list_point);
-	   var geo = (Geometry)line;
-	   var feat = Feature.fromGeometry(geo);
-	   fc.add(feat);
-	   return fc;
-   }
-   
-   private static ArrayList<Feature> writeConfine(){
-	   var fc = new ArrayList<Feature>();
-	   var list_point = new ArrayList<Point>();
-	   Point forestHill = Point.fromLngLat(-3.192473,55.946233);
-   	   Point kfc = Point.fromLngLat(-3.1843193,55.946233);
-   	   Point meadows = Point.fromLngLat(-3.192473,55.942617);
-   	   Point buccleuch = Point.fromLngLat(-3.184319, 55.942617);
-   	   list_point.add(forestHill);
-   	   list_point.add(kfc);
-   	   list_point.add(buccleuch);
-   	   list_point.add(meadows);
-   	   list_point.add(forestHill);
-   	   var line =  LineString.fromLngLats(list_point);
-	   var geo = (Geometry)line;
-	   var feat = Feature.fromGeometry(geo);
-	   feat.addNumberProperty("fill-opacity",0.75);
-	   feat.addStringProperty("stroke", "#ff0000");
-	   feat.addStringProperty("rgb-string", "#ff0000");
-	   feat.addStringProperty("fill", "#ff0000");
-	   fc.add(feat);
-	   return fc;
-   }
-   
+
    static boolean insidePolygon(ArrayList<Double> point, Polygon p) {
 	   var points = p.coordinates();
 	   var polyX = new ArrayList<Double>();
@@ -348,39 +246,5 @@ public class PathPlanner {
 	   }
 	   return false;
    }
-   
- 
-   
-   
-   
-   // this part is commented and will be copy - pasted after algorithm is finished
-//   boolean res = intersectsBuildings(list_coordinates.get(i),list_coordinates.get(j),pols);
-//   var list_point = new ArrayList<Point>();
-//   var point1 =  Point.fromLngLat(list_coordinates.get(i).get(0), list_coordinates.get(i).get(1));
-//   var point2 =  Point.fromLngLat(list_coordinates.get(j).get(0), list_coordinates.get(j).get(1));
-//   list_point.add(point1);
-//   list_point.add(point2);
-//   var line =  LineString.fromLngLats(list_point);
-//   var geo = (Geometry)line;
-//   var feat = Feature.fromGeometry(geo);
-//   feat.addNumberProperty("fill-opacity",0.75);
-//   if(res) {
-//	   feat.addStringProperty("stroke", "#ff0000");
-//	   feat.addStringProperty("rgb-string", "#ff0000");
-//		   feat.addStringProperty("fill", "#ff0000");
-//   }
-//   else {
-//		feat.addStringProperty("rgb-string", "#00ff00");
-//		feat.addStringProperty("fill", "#00ff00");
-//		}
-//   features.add(feat);
-   
-   
-	   
-   
-   
-   
-   
-   
-	
+   	
 }

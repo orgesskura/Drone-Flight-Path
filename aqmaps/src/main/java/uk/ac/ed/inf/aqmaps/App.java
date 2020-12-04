@@ -10,35 +10,95 @@ import com.mapbox.geojson.Polygon;
 public class App 
 {   
 	private final static int allowed_moves = 150;
-	static ArrayList<Point> list_point = new ArrayList<Point>();
-	static int nr_steps = 0;
-	static ArrayList<String> list_sensors_visited = new ArrayList<String>();
-	static ArrayList<Integer> list_angles = new ArrayList<Integer>();
-	static int visited = 0;
+    private final static double left_limit_x = -3.192473;
+    private final static double right_limit_x = -3.184319;
+    private final static double left_limit_y = 55.942617;
+    private final static double right_limit_y = 55.946233;
+    static final int number_sensors = 33;
+    static final double step_size = 0.0003;
+    static final double range_read = 0.0002;
+    private static final ArrayList<Sensor> list_sensors = new ArrayList<Sensor>();
+    private static final ArrayList<ArrayList<Double>> coordinates = new ArrayList<ArrayList<Double>>();
+    private static final ArrayList<Double> start  = new ArrayList<Double>();
+    private static final ArrayList<Polygon> buildings = new ArrayList<Polygon>();
+    private static final int[] perm = new int[number_sensors+1];
+    
     public static void main( String[] args )
     {
-    	String day = args[0],month = args[1],year = args[2],latit = args[3],longi = args[4];
-    	String port = args[6];
-    	JsonParser.parseJSon(day,month,year,port);
-    	var  buildings = new ArrayList<Polygon>();
-    	buildings = JsonParser.get_buildings();
-    	var coordinates = new ArrayList<ArrayList<Double>>();
-    	var start = new ArrayList<Double>();
+    	read_input(args[0],args[1],args[2],args[4],args[3],args[6]);
+    	var current_location = new ArrayList<Double>();
+    	current_location.add(start.get(0));
+    	current_location.add(start.get(1));
+    	ObstacleEvader.list_point.add(Point.fromLngLat(start.get(0), start.get(1)));
+    	var point = Point.fromLngLat(start.get(0),start.get(1));
+    	var drone = new Drone(allowed_moves,point);
+    	for(int i=1;i<coordinates.size();i++) {
+    		if(!drone.has_moves_left()) break;
+    		var order_visit = perm[i];
+    		var dest = new ArrayList<Double>();
+    		dest = coordinates.get(order_visit);
+    		while(true) {
+    			if(!drone.has_moves_left()) break;
+    			var bool = ObstacleEvader.avoidObstacles(i,order_visit,current_location, dest,buildings,list_sensors,drone);
+    			if (bool == true) {
+    				break;
+    			}
+    		}
+    	}
+       var end = new ArrayList<Double>();
+       end.add(start.get(0));
+       end.add(start.get(1)); 
+	   // i have already read all the sensors so i finish if i am within 0.0003
+       while(true) {
+            if(!drone.has_moves_left()) break;
+			int i=0,order_visit = 0;
+			var longit = ObstacleEvader.list_point.get(ObstacleEvader.list_point.size()-1).longitude();
+			var latitud = ObstacleEvader.list_point.get(ObstacleEvader.list_point.size()-1).latitude();
+			current_location.set(0, longit);
+			current_location.set(1,latitud);
+			var bool = ObstacleEvader.avoidObstacles(i,order_visit,current_location, end,buildings,list_sensors,drone);
+			if (bool == true) {
+				break;
+			}
+       }
+       var drone_x = drone.get_location().longitude();
+       var drone_y = drone.get_location().latitude();
+       current_location.set(0, drone_x);
+       current_location.set(1, drone_y);
+       
+       if(ObstacleEvader.nr_steps < allowed_moves) {
+    	   System.out.println("Success!! Drone read all the sensors and arrived close to its initial position in " +ObstacleEvader.nr_steps +" moves!!!!!" );
+       }
+       else if(ObstacleEvader.nr_steps == allowed_moves && PathPlanner.euclid_dist(current_location, start) < 0.0003) {
+    	   System.out.println("Success!! Drone read all the sensors and arrived close to its initial position in " + allowed_moves+" moves!!!!");
+       }
+       else {
+    	   System.out.println("Task was incomplete");
+       }
+       
+       Output.generateJson(list_sensors, coordinates, ObstacleEvader.list_point, buildings,args[0],args[1],args[2]);
+       Output.generateText(ObstacleEvader.list_sensors_visited, ObstacleEvader.list_angles, ObstacleEvader.list_point, args[0], args[1], args[2]);
+    	
+    }
+    
+    
+    private static void read_input(String day,String month, String year, String longi, String latit, String port) {
     	var longitude = Double.valueOf(longi);
     	var latitude = Double.valueOf(latit);
-    	var p = Point.fromLngLat(longitude, latitude);
-    	var drone = new Drone(allowed_moves,p);
-    	start.add(longitude);
-    	start.add(latitude);
-    	coordinates.add(start);
-    	coordinates.addAll(JsonParser.get_coordinates());
-    	//do this for maintainability.Nr of sensors we want to visit might change in the future
-    	int nr_points = coordinates.size();
-    	// get pathplanner to work given current coordinates and buildings
-    	PathPlanner.getPath(coordinates,nr_points,buildings);
-    	var perm = new int[34];
-    	perm = PathPlanner.get_permutation();
-    	var list_sensors = new ArrayList<Sensor>();
+    	check_input(longitude,latitude);
+    	JsonParser.parseJSon(day,month,year,port);
+    	var  building = new ArrayList<Polygon>();
+    	building = JsonParser.get_buildings();
+    	buildings.addAll(building);
+    	var coordinate = new ArrayList<ArrayList<Double>>();
+    	var start_location = new ArrayList<Double>();
+    	start_location.add(longitude);
+    	start_location.add(latitude);
+    	start.addAll(start_location);
+    	coordinate.add(start);
+    	coordinate.addAll(JsonParser.get_coordinates());
+    	coordinates.addAll(coordinate);
+    	var list_sensor = new ArrayList<Sensor>();
     	var list_battery = new ArrayList<Double>();
     	list_battery = JsonParser.get_battery();
     	var list_readings = new ArrayList<String>();
@@ -50,190 +110,25 @@ public class App
     		var reading = list_readings.get(i-1);
     		var battery = list_battery.get(i-1);
     		var sensor = new Sensor(location_what3Words,reading,battery,i);
-    		list_sensors.add(sensor);
+    		list_sensor.add(sensor);
     	}
-    	var current_location = new ArrayList<Double>();
-    	current_location.add(start.get(0));
-    	current_location.add(start.get(1));
-    	list_point.add(Point.fromLngLat(start.get(0), start.get(1)));
-    	for(int i=1;i<coordinates.size();i++) {
-    		if(!drone.has_moves_left()) break;
-    		var order_visit = perm[i];
-    		var dest = new ArrayList<Double>();
-    		dest = coordinates.get(order_visit);
-    		while(true) {
-    			if(!drone.has_moves_left()) break;
-    			var bool = avoidObstacles(i,order_visit,current_location, dest,buildings,list_sensors,drone);
-    			if (bool == true) {
-    				break;
-    			}
-    		}
-    	}
-       System.out.println(visited);
-       var end = new ArrayList<Double>();
-       end.add(start.get(0));
-       end.add(start.get(1)); 
-	   // i have already read all the sensors so i finish if i am within 0.0003
-       while(true) {
-            if(!drone.has_moves_left()) break;
-			int i=34,order_visit = 35;
-			current_location.set(0, list_point.get(list_point.size()-1).longitude());
-			current_location.set(1,list_point.get(list_point.size()-1).latitude());
-			var bool = avoidObstacles(i,order_visit,current_location, end,buildings,list_sensors,drone);
-			if (bool == true) {
-				break;
-			}
-       }
-       System.out.println(nr_steps);
-       System.out.println(list_point.size());
-       System.out.println(list_angles.size());
-       System.out.println(list_sensors_visited.size());
-       
-       Output.generateJson(list_sensors, coordinates, list_point, buildings,day,month,year);
-       Output.generateText(list_sensors_visited, list_angles, list_point, day, month, year);
-    	
-    }
-    
-    
-    private static boolean avoidObstacles(int i,int perm,ArrayList<Double> current_location, ArrayList<Double> dest,ArrayList<Polygon> buildings,ArrayList<Sensor> list_sensors,Drone drone) {
-    	if(visited ==33 && PathPlanner.euclid_dist(current_location,dest )< 0.0003) {
-			return true;
-		}
-		nr_steps++;
-		
-		var angle = angle(current_location,dest);
-		int angle_int = (int)Math.round(angle/10.0) * 10;
-		if(angle_int == 360) angle_int = 0;
-		System.out.println(angle_int);
-		System.out.println(visited);
-        double angle_radians = angle_int*Math.PI / 180.0 ;
-		var lng = current_location.get(0) + 0.0003 * Math.cos(angle_radians);
-		var lat = current_location.get(1) + 0.0003* Math.sin(angle_radians);
-		var temp = new ArrayList<Double>();
-		temp.add(lng);
-		temp.add(lat);
-		if(!PathPlanner.intersectsBuildings(current_location, temp, buildings)) {
-			
-			current_location.set(0, lng);
-			current_location.set(1, lat);
-			var point = Point.fromLngLat(lng, lat);
-			list_point.add(point);
-			System.out.println(temp.get(0) + ":" + temp.get(1));
-			System.out.println(" ");
-			System.out.println(dest.get(0)+ ":" + dest.get(1));
-		}// if temp is in polygons try optional route 
-		else {
-			var opt1 = new ArrayList<Double>();
-			var opt2 = new ArrayList<Double>();
-			var opt3 = new ArrayList<Double>();
-			var opt4 = new ArrayList<Double>();
-			lng = current_location.get(0) + 0.0003* getsgn(Math.cos(angle_radians));
-			lat = current_location.get(1) + 0.0003* getsgn(Math.sin(angle_radians));
-			var lng1 = current_location.get(0);
-			var lat1 = current_location.get(1);
-			var lng2 = current_location.get(0) - 0.0003* getsgn(Math.cos(angle_radians));
-			var lat2 = current_location.get(1) - 0.0003* getsgn(Math.sin(angle_radians));
-			opt1.add(lng1);
-			opt1.add(lat);
-			opt2.add(lng);
-			opt2.add(lat1);
-			opt3.add(lng2);
-			opt3.add(lat1);
-			opt4.add(lng1);
-			opt4.add(lat2);
-			if(!PathPlanner.intersectsBuildings(current_location,opt1, buildings)) {
-	    		if(opt1.get(1) >current_location.get(1) ) {
-	    			angle_int = 90;
-	    		}
-	    		else {
-	    			angle_int = 270;
-	    		}
-	    		System.out.println(temp.get(0) + ":" + temp.get(1));
-				System.out.println(" ");
-				System.out.println(dest.get(0)+ ":" + dest.get(1));
-				current_location.set(0, opt1.get(0));
-				current_location.set(1, opt1.get(1));
-				var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
-    			list_point.add(point);
-				
-			}
-			else if(!PathPlanner.intersectsBuildings(current_location,opt2, buildings)) {
-				if(opt2.get(0)>current_location.get(0)) {
-					angle_int = 0;
-				}
-				else {
-					angle_int = 180;
-				}
-				current_location.set(0, opt2.get(0));
-				current_location.set(1, opt2.get(1));
-				var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
-    			list_point.add(point);
-			}
-			else if (!PathPlanner.intersectsBuildings(current_location,opt3, buildings)) {
-				if(opt3.get(0) >current_location.get(0) ) {
-	    			angle_int = 0;
-	    		}
-	    		else {
-	    			angle_int = 180;
-	    		}
-	    		angle_radians = angle_int*Math.PI / 180.0;
-				current_location.set(0, opt3.get(0));
-				current_location.set(1, opt3.get(1));
-				var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
-    			list_point.add(point);
-				
-			}
-			else {
-				if(opt4.get(1)>current_location.get(1)) {
-					angle_int = 90;
-				}
-				else {
-					angle_int = 270;
-				}
-				current_location.set(0, opt4.get(0));
-				current_location.set(1, opt4.get(1));
-				var point = Point.fromLngLat(current_location.get(0), current_location.get(1));
-    			list_point.add(point);
-			}
-		}
-		var last_point = list_point.get(list_point.size()-1);
-		drone.move(last_point);
-		drone.decrease_moves();
-		list_angles.add(angle_int);
-		
-		if(drone.in_range(dest) && visited < 33) {
-			visited++;
-			System.out.println(visited);
-			var sensor = list_sensors.get(perm-1);
-			sensor.set_status(true);
-			list_sensors_visited.add(sensor.get_location());
-			return true;
-		}
-		
-		list_sensors_visited.add("null");
-		return false;
-    }
-    
-    private static double angle(ArrayList<Double> start, ArrayList<Double> end) {
- 	   double angle = Math.atan2(-start.get(1)+end.get(1), -start.get(0) + end.get(0));
- 	   angle = rad_to_degree(angle);
- 	   if (angle < 0) angle += 360;
- 	   return angle;
-    }
-
-    private static double rad_to_degree(double angle) {
-    	return angle * 180 / Math.PI;
-    }
- 
-    
-    private static int getsgn(double d) {
-    	if(d > 0) {
-    		return 1;
-    	}
-    	else {
-    		return -1;
+    	list_sensors.addAll(list_sensor);
+    	PathPlanner.getPath(coordinates,number_sensors + 1,buildings);
+    	var perms = new int[34];
+    	perms = PathPlanner.get_permutation();
+    	for(int i=0;i<perms.length;i++) {
+    		perm[i] = perms[i];
     	}
     }
     
+    
+    private static void check_input(double longitude,double latitude) {
+    	if(longitude < left_limit_x || longitude > right_limit_x || latitude < left_limit_y || latitude > right_limit_y) {
+    		System.out.println("Starting location is out of the confinement area. Run the application again");
+    		System.exit(0);
+    	}
+    }
+    
+   
     
 }
