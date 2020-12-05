@@ -30,7 +30,7 @@ public class Sensor {
 		return this.visited;
 	}
 	// read sensor and set its status to read
-	protected void read() {
+	protected void transmit_info() {
 		this.visited = true;
 	}
 	

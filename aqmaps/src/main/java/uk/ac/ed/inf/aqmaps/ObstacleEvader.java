@@ -132,7 +132,7 @@ public class ObstacleEvader {
 			// read sensor and increase number of visited sens
 			visited++;
 			var sensor = list_sensors.get(order_visit-1);
-			sensor.read();
+			sensor.transmit_info();
 			list_sensors_visited.add(sensor.get_location());
 			return true;
 		}
