@@ -14,7 +14,8 @@ path = os.path.join("..", sys.argv[1])
 
 with open("log.txt", "wb") as log:
       for i in range(1,13):
-         day = i
+       for j in range(1,32):
+         day = j
          month= i
          print(f"Testing {day} {month} {year}")
          log.write(f"Log for {day} {month} {year}:\n\n".encode())

@@ -214,7 +214,7 @@ public class JsonParser {
 	    }
 	    
 	    // main function to parse JSon files
-	    protected static void parseJSon(String day,String month,String year ,String port) {
+	    static void parseJSon(String day,String month,String year ,String port) {
 	    	readMap(day,month,year,port);
 	    	getBuildings(port);
 	    }
