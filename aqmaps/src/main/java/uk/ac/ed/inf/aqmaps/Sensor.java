@@ -14,23 +14,23 @@ public class Sensor {
 		this.visited = false;
 	}
 	//getter for location
-	protected String get_location() {
+	 String get_location() {
 		return this.location;
 	}
 	// getter for reading 
-	protected String get_reading() {
+	 String get_reading() {
 		return this.reading;
 	}
 	// getter for battery level
-	protected double get_batteryLevel() {
+	 double get_batteryLevel() {
 		return this.battery;
 	}
 	//getter for seeing if sensor is visited
-	protected boolean get_status() {
+	 boolean get_status() {
 		return this.visited;
 	}
 	// read sensor and set its status to read
-	protected void transmit_info() {
+	 void transmit_info() {
 		this.visited = true;
 	}
 	

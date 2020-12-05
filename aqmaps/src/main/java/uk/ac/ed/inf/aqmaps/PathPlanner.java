@@ -57,15 +57,6 @@ public class PathPlanner {
 	   }
    }
    
-   // find current tour value
-   public static double tourValue() {
-       double tour_value=0;
-       for (int i=0;i<34;i++) {
-    	 //find current tour value 
-         tour_value+=dist[perm[i]][perm[(i+1)%34]];
-       }
-       return tour_value;
-   }
    
    
    
@@ -210,41 +201,5 @@ public class PathPlanner {
 		return true;
    }
    
-   
-
-   static boolean insidePolygon(ArrayList<Double> point, Polygon p) {
-	   var points = p.coordinates();
-	   var polyX = new ArrayList<Double>();
-	   var polyY = new ArrayList<Double>();
-	   for (var list: points.get(0)){
-		   polyX.add(list.longitude());
-		   polyY.add(list.latitude());
-	   }
-	    var x = point.get(0);
-	    var y = point.get(1);
-	    var inside = false;
-	    for (int i = 0, j = polyX.size() - 1;  i < polyX.size(); j = i++) { 
-	        var xi = polyX.get(i);
-	        var yi = polyY.get(i);
-	        var xj = polyX.get(j);
-	        var yj = polyY.get(j);
-	        
-	        var intersect = ((yi > y) != (yj > y))
-	            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-	        if (intersect) inside = !inside;
-	    }
-	    
-	    return inside;
-	   
-   }
-   
-    static boolean inPolygons(ArrayList<Double> point,ArrayList<Polygon> pols) {
-	   for (var pol : pols) {
-		   if (insidePolygon(point,pol)) {
-			   return true;
-		   }
-	   }
-	   return false;
-   }
    	
 }
