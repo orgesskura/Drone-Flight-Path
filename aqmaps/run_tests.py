@@ -9,21 +9,18 @@ os.chdir("ilp-results")
 
 args = "{day} {month} {year} 55.944425 -3.188396 5678 8888"
 
-year = 2021
+year = 2020
 path = os.path.join("..", sys.argv[1])
 
 with open("log.txt", "wb") as log:
     for i in range(1, 13):
-       for j in range(1,32):
-         if i == 2 and i > 29 :
-             break
-         day = j
+         day = i
          month= i
          print(f"Testing {day} {month} {year}")
          log.write(f"Log for {day} {month} {year}:\n\n".encode())
          try:
             proc = Popen(shlex.split(f"java -jar {path} " \
-                                     + args.format(year=2021,
+                                     + args.format(year=2020,
                                                    month=str(month).zfill(2),
                                                    day=str(day).zfill(2))),
                          stdout=PIPE)

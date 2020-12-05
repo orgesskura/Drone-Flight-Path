@@ -129,9 +129,10 @@ public class ObstacleEvader {
 		list_angles.add(angle_int);
 		// if drone is in range of a sensor and it has not visited all of the sensors
 		if(drone.in_range(dest) && visited < 33) {
+			// read sensor and increase number of visited sens
 			visited++;
 			var sensor = list_sensors.get(order_visit-1);
-			sensor.set_status(true);
+			sensor.read();
 			list_sensors_visited.add(sensor.get_location());
 			return true;
 		}

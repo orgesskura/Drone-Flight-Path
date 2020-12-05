@@ -29,9 +29,9 @@ public class Sensor {
 	protected boolean get_status() {
 		return this.visited;
 	}
-	// set the status of sensor if visited
-	protected void set_status(boolean b) {
-		this.visited = b;
+	// read sensor and set its status to read
+	protected void read() {
+		this.visited = true;
 	}
 	
 	
