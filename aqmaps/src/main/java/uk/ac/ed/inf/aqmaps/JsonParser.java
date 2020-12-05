@@ -180,9 +180,9 @@ public class JsonParser {
 	    }
 	    
 	    //read buildings folder to get no-fly zones
-	    private static void getBuildings() {
+	    private static void getBuildings(String port) {
 	    	//location of no fly zones buildings
-	    	String urlString = "http://localhost:8888/buildings/no-fly-zones.geojson";
+	    	String urlString = "http://localhost:" + port + "/buildings/no-fly-zones.geojson";
 	    	// HttpClient assumes that it is a GET request by default.
 	    	var request = HttpRequest.newBuilder()
 	    			      .uri(URI.create(urlString))
@@ -216,7 +216,7 @@ public class JsonParser {
 	    // main function to parse JSon files
 	    protected static void parseJSon(String day,String month,String year ,String port) {
 	    	readMap(day,month,year,port);
-	    	getBuildings();
+	    	getBuildings(port);
 	    }
 	    
 }

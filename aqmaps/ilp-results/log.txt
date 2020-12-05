@@ -1,0 +1,109 @@
+Log for 1 1 2020:
+
+Sensor at location bend.tubes.chops needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 110 moves!!!!!
+
+Last Line of test for 1 1 2020
+
+Log for 2 2 2020:
+
+Sensor at location only.fairly.rift needs battery replacement!!!!
+Sensor at location atoms.vanish.foods needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 94 moves!!!!!
+
+Last Line of test for 2 2 2020
+
+Log for 3 3 2020:
+
+Sensor at location turkey.limit.ramp needs battery replacement!!!!
+Sensor at location hidden.handle.softly needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 108 moves!!!!!
+
+Last Line of test for 3 3 2020
+
+Log for 4 4 2020:
+
+Sensor at location valve.elaborate.fortunate needs battery replacement!!!!
+Sensor at location hello.love.keys needs battery replacement!!!!
+Sensor at location jump.crop.fits needs battery replacement!!!!
+Sensor at location stone.undulation.poems needs battery replacement!!!!
+Sensor at location region.passes.pencil needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 97 moves!!!!!
+
+Last Line of test for 4 4 2020
+
+Log for 5 5 2020:
+
+Sensor at location boost.radar.stress needs battery replacement!!!!
+Sensor at location spicy.bunch.shady needs battery replacement!!!!
+Sensor at location artist.gets.react needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 106 moves!!!!!
+
+Last Line of test for 5 5 2020
+
+Log for 6 6 2020:
+
+Sensor at location slips.mass.baking needs battery replacement!!!!
+Sensor at location skills.less.herb needs battery replacement!!!!
+Sensor at location relate.chill.vest needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 99 moves!!!!!
+
+Last Line of test for 6 6 2020
+
+Log for 7 7 2020:
+
+Sensor at location tonic.bliss.cove needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 104 moves!!!!!
+
+Last Line of test for 7 7 2020
+
+Log for 8 8 2020:
+
+Sensor at location only.fairly.rift needs battery replacement!!!!
+Sensor at location slide.leads.stores needs battery replacement!!!!
+Sensor at location scare.cubs.resort needs battery replacement!!!!
+Sensor at location pump.wheels.hulk needs battery replacement!!!!
+Sensor at location stops.else.chats needs battery replacement!!!!
+Sensor at location rooms.lamp.teach needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 89 moves!!!!!
+
+Last Line of test for 8 8 2020
+
+Log for 9 9 2020:
+
+Sensor at location artist.gets.react needs battery replacement!!!!
+Sensor at location record.sofa.sock needs battery replacement!!!!
+Sensor at location toned.deflection.bland needs battery replacement!!!!
+Sensor at location shady.soft.phones needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 117 moves!!!!!
+
+Last Line of test for 9 9 2020
+
+Log for 10 10 2020:
+
+Sensor at location relate.chill.vest needs battery replacement!!!!
+Sensor at location shut.stands.media needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 99 moves!!!!!
+
+Last Line of test for 10 10 2020
+
+Log for 11 11 2020:
+
+Sensor at location paying.crowd.weep needs battery replacement!!!!
+Sensor at location else.urban.museum needs battery replacement!!!!
+Sensor at location second.launch.miles needs battery replacement!!!!
+Sensor at location valve.elaborate.fortunate needs battery replacement!!!!
+Sensor at location brings.remedy.latter needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 98 moves!!!!!
+
+Last Line of test for 11 11 2020
+
+Log for 12 12 2020:
+
+Sensor at location slide.leads.stores needs battery replacement!!!!
+Sensor at location skills.less.herb needs battery replacement!!!!
+Sensor at location simple.rust.audio needs battery replacement!!!!
+Success!! Drone read all the sensors and arrived close to its initial position in 98 moves!!!!!
+
+Last Line of test for 12 12 2020
+

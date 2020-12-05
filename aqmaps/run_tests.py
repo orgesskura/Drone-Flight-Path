@@ -13,7 +13,7 @@ year = 2020
 path = os.path.join("..", sys.argv[1])
 
 with open("log.txt", "wb") as log:
-    for i in range(1, 13):
+      for i in range(1,13):
          day = i
          month= i
          print(f"Testing {day} {month} {year}")
