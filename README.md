@@ -5,4 +5,6 @@ Here is an example of the path taken by the drone:
 
 The source code for the project is in the aqmaps folder. The heatmap folder was for a small part of coursework. We used Maven for the project.
 
+An example path for the date of 11-11-2020 is shown below:
+
 ![Screenshot](11_11_2020.png)
